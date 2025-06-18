@@ -21,9 +21,7 @@ defmodule Phoenix.PubSub.Supervisor do
     adapter = opts[:adapter] || Phoenix.PubSub.PG2
     adapter_name = Module.concat(name, "Adapter")
 
-    partitions =
-      opts[:pool_size] ||
-        System.schedulers_online() |> Kernel./(4) |> Float.ceil() |> trunc()
+    partitions = 4
 
     registry = [
       meta: [pubsub: {adapter, adapter_name}],
