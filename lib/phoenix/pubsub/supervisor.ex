@@ -28,7 +28,7 @@ defmodule Phoenix.PubSub.Supervisor do
     registry = [
       meta: [pubsub: {adapter, adapter_name}],
       partitions: partitions,
-      keys: :duplicate,
+      keys: {:duplicate, :key},
       name: name
     ]
 
