@@ -119,6 +119,7 @@ defmodule Phoenix.Tracker.Shard do
 
   def init([tracker, tracker_opts, shard_opts]) do
     Process.flag(:trap_exit, true)
+    Process.flag(:message_queue_data, :off_heap)
     shard_name           = Keyword.fetch!(shard_opts, :name)
     pubsub_server        = Keyword.fetch!(shard_opts, :pubsub_server)
     broadcast_period     = shard_opts[:broadcast_period] || 1500
