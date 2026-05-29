@@ -313,6 +313,11 @@ defmodule Phoenix.Tracker do
     * `:log_level` - The log level to log events, defaults `:debug` and can be
       disabled with `false`
     * `:pool_size` - The number of tracker shards to launch. Default `1`
+    * `:message_queue_data` - The value of the BEAM `message_queue_data`
+      process flag applied to each shard process. Accepts `:on_heap` or
+      `:off_heap`. Defaults to `:on_heap`. Set to `:off_heap` for trackers
+      with large or bursty mailboxes to avoid GC interactions with message
+      queue data.
   """
   def start_link(tracker, tracker_arg, pool_opts) do
     name = Keyword.fetch!(pool_opts, :name)

@@ -113,8 +113,14 @@ defmodule Phoenix.Tracker.Shard do
     tracker_name = Keyword.fetch!(pool_opts, :name)
     name = name_for_number(tracker_name, number)
     shard_opts = Keyword.put(pool_opts, :name, name)
-    GenServer.start_link(__MODULE__,
-      [tracker, tracker_opts, shard_opts], name: name)
+    message_queue_data = Keyword.get(pool_opts, :message_queue_data, :on_heap)
+
+    GenServer.start_link(
+      __MODULE__,
+      [tracker, tracker_opts, shard_opts],
+      name: name,
+      spawn_opt: [message_queue_data: message_queue_data]
+    )
   end
 
   def init([tracker, tracker_opts, shard_opts]) do
