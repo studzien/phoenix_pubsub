@@ -429,6 +429,10 @@ defmodule Phoenix.Tracker.Shard do
     log state, fn -> "#{state.replica.name}: replica up from #{inspect remote_replica.name}" end
     {presences, joined, []} = State.replica_up(state.presences, Replica.ref(remote_replica))
 
+    log state,
+        fn -> "#{state.replica.name}: #{length(joined)} users joined from replica #{inspect remote_replica.name}" end,
+        sample: sample_users(joined)
+
     state
     |> report_diff(joined, [])
     |> put_presences(presences)
@@ -439,9 +443,20 @@ defmodule Phoenix.Tracker.Shard do
     log state, fn -> "#{state.replica.name}: replica down from #{inspect remote_replica.name}" end
     {presences, [], left} = State.replica_down(state.presences, Replica.ref(remote_replica))
 
+    log state,
+        fn -> "#{state.replica.name}: #{length(left)} users left from replica #{inspect remote_replica.name}" end,
+        sample: sample_users(left)
+
     state
     |> report_diff([], left)
     |> put_presences(presences)
+  end
+
+  @sample_size 5
+  defp sample_users(values) do
+    values
+    |> Enum.take(@sample_size)
+    |> Enum.map(fn {{_topic, _pid, key}, meta, _tag} -> %{key: key, meta: meta} end)
   end
 
   defp permdown(state, %Replica{name: name} = remote_replica) do
@@ -563,6 +578,7 @@ defmodule Phoenix.Tracker.Shard do
     Base.url_encode64(binary)
   end
 
-  defp log(%{log_level: false}, _msg_func), do: :ok
-  defp log(%{log_level: level}, msg), do: Logger.log(level, msg)
+  defp log(state, msg_func, metadata \\ [])
+  defp log(%{log_level: false}, _msg_func, _metadata), do: :ok
+  defp log(%{log_level: level}, msg, metadata), do: Logger.log(level, msg, metadata)
 end
